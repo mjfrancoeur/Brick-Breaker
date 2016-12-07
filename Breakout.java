@@ -86,7 +86,7 @@ public class Breakout extends GraphicsProgram {
 		gameStart();
 	}
 	
-	
+	// Draws and sets all game elements on the canvas
 	private void gameSetup() {
 		brickSetup();
 		paddleSetup();
@@ -165,11 +165,10 @@ public class Breakout extends GraphicsProgram {
 			pause(DELAY);
 			checkForFloor();
 			checkForCeiling();
-			checkForBricks();
-			checkForPaddle();
+			checkForObjects();
 			checkForWalls();
 		}
-		}
+	}
 	
 	private double setVX() {
 		vx = rgen.nextDouble(1.0, 3.0);
@@ -179,28 +178,51 @@ public class Breakout extends GraphicsProgram {
 		return vx;
 	}
 	
-	private void checkForBricks() {
-		GObject collObject = getElementAt(ball.getX(), ball.getY());
-		if (collObject == brick) {
-			remove(brick);
+	// Checks if ball is colliding with the paddle or a brick
+	private void checkForObjects() {
+		GObject collObject = getObject();
+		if(collObject == paddle) {
+			// Checks to see if ball is inside the play-area
+			if (ballInPlay()) {
+				vy = -vy;
+			} 
+		} 
+		// if collObject is not equal to paddle or null, it is a brick object
+		else if (collObject != null) {
+			remove(collObject);
 			vy = -vy;
-			ball.move(vx, vy);
 		}
 	}
 	
-	private void checkForPaddle() {
-		GObject collObject = getElementAt(ball.getX(), (ball.getY() + BALL_RADIUS * 2));
-		if(collObject == paddle) {
-			vy = -vy;
-			ball.move(vx, vy);
+	// Checks to see if ball remains in play (is above the paddle)
+	private boolean ballInPlay() {
+		if (ball.getY() + BALL_RADIUS * 2 < (APPLICATION_HEIGHT - PADDLE_Y_OFFSET + PADDLE_HEIGHT)) { 
+			return true; 
 		}
+		return false;
+	}
+	
+	// If the ball is touching another object, will return that object. Otherwise, returns null.
+	private GObject getObject() {
+	
+		if ((getElementAt(ball.getX(), ball.getY())) != null) {
+	        return getElementAt(ball.getX(), ball.getY());
+	    } else if (getElementAt(ball.getX(), ball.getY() + BALL_RADIUS * 2) != null) {
+	        return getElementAt(ball.getX(), ball.getY() + BALL_RADIUS * 2);
+	    } else if (getElementAt(ball.getX() + BALL_RADIUS * 2, ball.getY()) != null) {
+	    	return getElementAt(ball.getX() + BALL_RADIUS * 2, ball.getY());
+	    } else if (getElementAt(ball.getX() + BALL_RADIUS * 2, ball.getY() + BALL_RADIUS * 2) != null) {
+	    	return getElementAt(ball.getX() + BALL_RADIUS * 2, ball.getY() + BALL_RADIUS * 2);
+		} 
+		return null;
 	}
 	
 	private void checkForFloor() {
-		/** IF BALL GOES BELOW WINDOW */
+		/* IF BALL GOES BELOW WINDOW */
 		if(ball.getY() > APPLICATION_HEIGHT) {
 			turnsCounter++;
-			if(turnsCounter < NTURNS) {
+			// Resets ball to starting location
+			if (turnsCounter < NTURNS) {
 				ball.setLocation(X_BALL_START, Y_BALL_START);
 				ball.move(setVX(), vy);
 			} else {
@@ -208,33 +230,25 @@ public class Breakout extends GraphicsProgram {
 				add(gameOver, (APPLICATION_WIDTH - gameOver.getWidth()) / 2, (APPLICATION_HEIGHT - gameOver.getAscent()) / 2.0); 
 			}
 		}
-		}
+	}
 		
 	private void checkForCeiling() {
 		/* IF BALL HITS CEILING */
 		if(ball.getY() <= 0) {
 			vy = -vy;
-			ball.move(vx, vy);
 		}
 	}
 	
 	private void checkForWalls() {
 		/* IF BALL HITS WALLS */
-	
-		
-	if(ball.getX() <= 0) {
-		vx = -vx;
-		ball.move(vx, vy);
-	} else if(ball.getX() >= (APPLICATION_WIDTH - (BALL_RADIUS * 2.0))) {
-		vx = -vx;
-		ball.move(vx,vy);
-	}
+		if (ball.getX() <= 0) {
+			vx = -vx;
+		} else if (ball.getX() >= (APPLICATION_WIDTH - (BALL_RADIUS * 2.0))) {
+			vx = -vx;
+		}
 	}
 	
-	
-	
-	
-	/** initalizes an instance of the RandomGenerator */
+	/** initializes an instance of the RandomGenerator */
 	RandomGenerator rgen = new RandomGenerator();
 	
 	/** initializes the variable for the X-Coordinate of the mouse */
