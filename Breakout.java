@@ -157,6 +157,7 @@ public class Breakout extends GraphicsProgram {
 		add(ball);
 		}
 	
+	// Sets velocity and sets ball into motion, checking for collisions
 	private void ballMove() {
 		vx = setVX();
 		vy = 3.0;
@@ -170,6 +171,7 @@ public class Breakout extends GraphicsProgram {
 		}
 	}
 	
+	// Sets the velocity
 	private double setVX() {
 		vx = rgen.nextDouble(1.0, 3.0);
 		if (rgen.nextBoolean(0.5)) {
